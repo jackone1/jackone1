@@ -8,7 +8,7 @@ public class DeviceDao {
 	
 	private ConcurrentHashMap<String, Device> fakeDB = new ConcurrentHashMap<String, Device>();
 
-	public DeviceDao() {
+	public DeviceDao() { 
 		super(); 
 		
 		fakeDB.put("192.168.1.1", new Device("192.168.1.1"));
