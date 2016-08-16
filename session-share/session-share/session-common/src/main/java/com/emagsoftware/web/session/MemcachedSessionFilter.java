@@ -5,10 +5,19 @@
 
 package com.emagsoftware.web.session;
 
-import javax.servlet.*;
+import java.io.IOException;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * rewrite HttpServletRequest,change getSession method,use memcached session implement
@@ -18,6 +27,8 @@ import java.io.IOException;
  */
 
 public class MemcachedSessionFilter implements Filter {
+	private final static Logger log = LoggerFactory.getLogger(MemcachedSessionFilter.class);
+	
     public static final String[] IGNORE_SUFFIX = new String[]{".png", ".jpg", ".jpeg", ".gif", ".css", ".js", ".html", ".htm"};
     private MemcachedSessionManager sessionManager;
 
@@ -30,8 +41,6 @@ public class MemcachedSessionFilter implements Filter {
     }
 
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-    	System.out.println("doFilter");
-    	
     	HttpServletRequest request = (HttpServletRequest) servletRequest;
         //igonre image,css or javascript file request
         if (shouldFilter(request) == false) {

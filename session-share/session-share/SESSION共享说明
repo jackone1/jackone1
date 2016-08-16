@@ -8,4 +8,8 @@
 	http://【IP】:【端口】/session-web1/SessionDemo1?change=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
 
 界面使session失效：
-	http://【IP】:【端口】/session-web1/SessionDemo1?clear=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE	
+	http://【IP】:【端口】/session-web1/SessionDemo1?clear=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+
+共享使用：
+session-common	
+		

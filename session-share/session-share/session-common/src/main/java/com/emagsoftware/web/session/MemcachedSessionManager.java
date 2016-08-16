@@ -5,16 +5,18 @@
 
 package com.emagsoftware.web.session;
 
-import net.rubyeye.xmemcached.MemcachedClient;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import net.rubyeye.xmemcached.MemcachedClient;
 
 /**
  * MemcachedSessionManager
@@ -24,6 +26,8 @@ import java.util.UUID;
  */
 
 public class MemcachedSessionManager {
+	private final static Logger log = LoggerFactory.getLogger(MemcachedSessionFilter.class);
+
     public static final String SESSION_ID_PREFIX = "M_JSID_";
     public static final String SESSION_ID_COOKIE = "JSESSIONID";
 
@@ -31,7 +35,6 @@ public class MemcachedSessionManager {
     /*如果session没有变化，则5分钟更新一次memcached*/
     private int expirationUpdateInterval = 5 * 60;
     private int maxInactiveInterval = 30 * 60;
-    private Logger log = Logger.getLogger(getClass());
 
     public void setMemcachedClient(MemcachedClient memcachedClient) {
         this.memcachedClient = memcachedClient;
@@ -84,9 +87,11 @@ public class MemcachedSessionManager {
 
     private void saveSession(MemcachedHttpSession session) {
         try {
-            
-                System.out.println("MemcachedHttpSession saveSession [ID=" + session.id+ ",isNew=" + session.isNew + ",isDiry=" + session.isDirty + ",isExpired=" + session.expired + "]");
-            if(session.expired)
+        	if (log.isDebugEnabled()) {
+        		log.debug("MemcachedHttpSession saveSession [ID=" + session.id+ ",isNew=" + session.isNew + ",isDiry=" + session.isDirty + ",isExpired=" + session.expired + "]");
+			}
+        
+        	if(session.expired)
                 memcachedClient.delete(generatorSessionKey(session.id));
             else
                 memcachedClient.set(generatorSessionKey(session.id), session.maxInactiveInterval+expirationUpdateInterval, session);
@@ -102,7 +107,10 @@ public class MemcachedSessionManager {
         session.maxInactiveInterval = maxInactiveInterval;
         session.isNew = true;
         
-            System.out.println("MemcachedHttpSession Create [ID=" + session.id + "]");
+        if (log.isDebugEnabled()) {
+    		log.debug("MemcachedHttpSession Create [ID=" + session.id + "]");
+		}
+
         saveCookie(session, request, response);
         return session;
     }
@@ -128,8 +136,12 @@ public class MemcachedSessionManager {
         requestEventSubject.attach(new RequestEventObserver() {
             public void completed(HttpServletRequest servletRequest, HttpServletResponse response) {
                 int updateInterval = (int) ((System.currentTimeMillis() - session.lastAccessedTime) / 1000);
+              
                 
-                    System.out.println("MemcachedHttpSession Request completed [ID=" + session.id + ",lastAccessedTime=" + session.lastAccessedTime + ",updateInterval=" + updateInterval + "]");
+                if (log.isDebugEnabled()) {
+            		log.debug("MemcachedHttpSession Request completed [ID=" + session.id + ",lastAccessedTime=" + session.lastAccessedTime + ",updateInterval=" + updateInterval + "]");
+        		}
+                
                 //非新创建session，数据未更改且未到更新间隔，则不更新memcached
                 if (session.isNew == false && session.isDirty == false && updateInterval < expirationUpdateInterval)
                     return;
@@ -152,8 +164,9 @@ public class MemcachedSessionManager {
 		}
         response.addCookie(cookie);
 
-        
-            System.out.println("MemcachedHttpSession saveCookie [ID=" + session.id + "]");
+        if (log.isDebugEnabled()) {
+    		log.debug("MemcachedHttpSession saveCookie [ID=" + session.id + "]");
+		}
     }
 
     private MemcachedHttpSession loadSession(String sessionId) {
@@ -161,14 +174,19 @@ public class MemcachedSessionManager {
             
             MemcachedHttpSession session = memcachedClient.get(generatorSessionKey(sessionId));
 			
-                System.out.println("MemcachedHttpSession Load [ID=" + sessionId + ",exist=" + (session!=null) + "]");
+            if (log.isDebugEnabled()) {
+        		log.debug("MemcachedHttpSession Load [ID=" + sessionId + ",exist=" + (session!=null) + "]");
+    		}
+            
             if(session != null){
                 session.isNew = false;
                 session.isDirty = false;
             }
             return session;
         } catch (Exception e) {
-            System.out.println("exception loadSession [Id=" + sessionId + "]");
+            if (log.isDebugEnabled()) {
+        		log.debug("exception loadSession [Id=" + sessionId + "]");
+    		}
             return null;
         }
 
