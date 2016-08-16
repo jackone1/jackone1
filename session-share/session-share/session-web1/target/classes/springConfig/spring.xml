@@ -18,11 +18,17 @@
 <!-- 		</property> -->
 <!-- 	</bean> -->
 
-<bean id="memcachedClient" class="net.rubyeye.xmemcached.XMemcachedClient">
-</bean>
+	<bean id="memcachedClient"
+		class="net.rubyeye.xmemcached.utils.XMemcachedClientFactoryBean">
+		<property name="servers">
+			<value>127.0.0.1:11211</value>
+		</property>
+	</bean>
 
 <bean id="memcachedSessionManager" class="com.emagsoftware.web.session.MemcachedSessionManager">
     <property name="memcachedClient" ref="memcachedClient"></property>
+<!--     <property name="expirationUpdateInterval" value="expirationUpdateInterval"></property> -->
+<!--     <property name="maxInactiveInterval" ref="maxInactiveInterval"></property> -->
 </bean>
 
 <bean id="memcachedSessionFilter" class="com.emagsoftware.web.session.MemcachedSessionFilter">

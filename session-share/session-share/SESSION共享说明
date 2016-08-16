@@ -1,0 +1,11 @@
+
+访问地址后增加参数“JSESSIONID”将session-id回传到服务端
+
+界面查询session值：
+	http://【IP】:【端口】/session-web1/?JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+
+界面修改session值：
+	http://【IP】:【端口】/session-web1/SessionDemo1?change=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+
+界面使session失效：
+	http://【IP】:【端口】/session-web1/SessionDemo1?clear=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE	
