@@ -1,15 +1,33 @@
 
-访问地址后增加参数“JSESSIONID”将session-id回传到服务端
+1.访问地址后增加参数“JSESSIONID”将session-id回传到服务端
 
-界面查询session值：
-	http://【IP】:【端口】/session-web1/?JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+2.	DEMO界面查询session值：
+		http://【IP】:【端口】/session-web1/?JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+	DEMO界面修改session值：
+		http://【IP】:【端口】/session-web1/SessionDemo1?change=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+	DEMO界面使session失效：
+		http://【IP】:【端口】/session-web1/SessionDemo1?clear=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
 
-界面修改session值：
-	http://【IP】:【端口】/session-web1/SessionDemo1?change=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
+3.共享使用：
 
-界面使session失效：
-	http://【IP】:【端口】/session-web1/SessionDemo1?clear=aaaa000000&JSESSIONID=1471335674500-F04E10A29FFDB2A49E31BE
-
-共享使用：
-session-common	
-		
+SESSION共享代码：session-common
+	注：本代码中使用的memcached为：com.googlecode.xmemcached，如需使用其它的memcached，请修改对应代码。
+	
+WEB工程配置1：
+	配置spring-bean：memcachedSessionFilter
+	
+WEB工程配置2-WEB.XML：
+	<filter>
+		<filter-name>springFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+		<init-param>
+			<param-name>targetBeanName</param-name>
+			<param-value>memcachedSessionFilter</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>springFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	
